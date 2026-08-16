@@ -4,6 +4,13 @@ service:
   type: ClusterIP
   port: 80
 
+config:
+  watchPlugins: true
+pluginsManager:
+  enabled: true
+  baseImage: node:lts-alpine
+  version: latest
+
 # Behind Traefik, TLS terminated at the ingress with a cert-manager cert.
 # Change the hostname below to something real before your first sync.
 ingress:
