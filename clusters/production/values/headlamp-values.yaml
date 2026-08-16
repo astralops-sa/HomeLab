@@ -14,7 +14,6 @@ pluginsManager:
       - name: cert-manager
         source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_cert-manager
         version: 0.1.0
-        version: 0.1.3
       - name: capsule
         source: https://artifacthub.io/packages/headlamp/headlamp-capsule/capsule
         version: 0.1.0
