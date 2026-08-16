@@ -19,7 +19,7 @@ pluginsManager:
         version: 0.1.0
       - name: capsule
         source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_capsule
-        version: 0.1.0
+        version: 0.1.0-beta1
     installOptions:
       parallel: true
       maxConcurrent: 2
