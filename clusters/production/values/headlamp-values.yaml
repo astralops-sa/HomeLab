@@ -50,3 +50,32 @@ clusterRoleBinding:
 
 # In-cluster mode needs a token to log in. After it's up, generate one with:
 #   kubectl create token headlamp -n headlamp --duration=8760h
+
+# The ArgoCD plugin reads Application CRs directly via the k8s API, so the
+# headlamp ServiceAccount needs explicit RBAC for argoproj.io/applications
+# (the blanket cluster-admin binding above covers it too, but this keeps the
+# actual requirement documented and would survive that binding being scoped
+# down later).
+extraManifests:
+  - |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: argocd-headlamp-plugin
+    rules:
+      - apiGroups: ["argoproj.io"]
+        resources: ["applications"]
+        verbs: ["get", "list", "watch", "patch"]
+  - |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: argocd-headlamp-plugin
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: argocd-headlamp-plugin
+    subjects:
+      - kind: ServiceAccount
+        name: headlamp
+        namespace: headlamp
