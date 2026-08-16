@@ -14,7 +14,7 @@ spec:
   sources:
     - repoURL: https://projectcapsule.github.io/charts
       chart: capsule
-      targetRevision: 0.7.2
+      targetRevision: 0.13.11
       helm:
         releaseName: capsule
         valueFiles:
