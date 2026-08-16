@@ -1,0 +1,11 @@
+replicaCount: 1
+
+manager:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+
+certManager:
+  generateCertificates: true
+

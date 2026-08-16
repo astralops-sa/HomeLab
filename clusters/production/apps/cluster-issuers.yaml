@@ -1,0 +1,26 @@
+# Plain-manifest Application (no Helm chart) for cluster-scoped cert-manager
+# Issuers. Runs one wave after cert-manager so its CRDs/webhook are ready
+# before the ClusterIssuer is applied.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-issuers
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/astralops-sa/HomeLab
+    targetRevision: main
+    path: clusters/production/manifests/cluster-issuers
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

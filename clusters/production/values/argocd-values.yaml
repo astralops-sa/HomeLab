@@ -1,0 +1,39 @@
+# ArgoCD behind Traefik (k3s default ingress), TLS terminated at the ingress
+# using a cert-manager-issued cert.
+global:
+  domain: argocd.homelab.local   # <-- change to a real hostname you control
+
+configs:
+  params:
+    # ArgoCD serves plain HTTP internally; Traefik terminates TLS at the
+    # ingress using the cert-manager cert below. Without this, ArgoCD's
+    # own TLS + the ingress's TLS fight each other.
+    server.insecure: true
+
+controller:
+  replicas: 1
+
+server:
+  replicas: 1
+  autoscaling:
+    enabled: false
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      cert-manager.io/cluster-issuer: ca-issuer
+    # true (no extraTls) -> chart requests a cert into the argocd-server-tls
+    # secret for global.domain, via the cert-manager.io/cluster-issuer
+    # annotation above (cert-manager's ingress-shim watches for it).
+    tls: true
+
+repoServer:
+  replicas: 1
+
+applicationSet:
+  replicas: 1
+
+redis-ha:
+  enabled: false

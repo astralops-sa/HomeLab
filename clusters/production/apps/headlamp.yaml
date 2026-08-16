@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: headlamp
+  namespace: argocd
+  annotations:
+    # wave 2: wants the selfsigned-issuer (wave 1) to exist so its Ingress's
+    # cert-manager annotation resolves cleanly on first sync
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://kubernetes-sigs.github.io/headlamp/
+      chart: headlamp
+      targetRevision: 0.30.1
+      helm:
+        releaseName: headlamp
+        valueFiles:
+          - $values/clusters/production/values/headlamp-values.yaml
+    - repoURL: https://github.com/astralops-sa/HomeLab
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: headlamp
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,27 @@
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+
+# Behind Traefik, TLS terminated at the ingress with a cert-manager cert.
+# Change the hostname below to something real before your first sync.
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: ca-issuer
+  hosts:
+    - host: headlamp.homelab.local   # <-- change to a real hostname you control
+      paths:
+        - path: /
+          type: Prefix
+  tls:
+    - secretName: headlamp-tls
+      hosts:
+        - headlamp.homelab.local     # <-- keep in sync with hosts[0].host above
+
+# In-cluster mode needs a token to log in. After it's up, generate one with:
+#   kubectl create token headlamp -n headlamp --duration=8760h
+# (assuming the chart's default ServiceAccount is used; grant it cluster-admin
+# or a narrower ClusterRoleBinding depending on how much access you want it to have)

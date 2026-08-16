@@ -1,0 +1,14 @@
+crds:
+  enabled: true
+
+replicaCount: 1
+webhook:
+  replicaCount: 1
+cainjector:
+  replicaCount: 1
+
+# Single-node: keep it light.
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi

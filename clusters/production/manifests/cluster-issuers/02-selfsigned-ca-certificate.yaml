@@ -1,0 +1,27 @@
+# Step 2 of 3: the root CA cert itself. Signed by the bootstrap issuer,
+# lives in the cert-manager namespace because that's where a ClusterIssuer
+# looks up its secrets by default (cert-manager's "cluster resource
+# namespace").
+#
+# This is the ONE certificate you import into your OS/browser trust store —
+# after that, every leaf cert this CA issues (ArgoCD, Headlamp, anything
+# else you point at ca-issuer) is trusted with no per-site warnings.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: selfsigned-ca
+  namespace: cert-manager
+spec:
+  isCA: true
+  commonName: k3s-lab-ca
+  secretName: selfsigned-ca-tls
+  duration: 87600h    # 10y — it's a root you'll import once, not something
+                       # you want to be renewing/re-trusting often
+  renewBefore: 720h    # 30d
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned-bootstrap
+    kind: ClusterIssuer
+    group: cert-manager.io

@@ -1,0 +1,33 @@
+# sync-wave 1: capsule's webhook can use cert-manager for its certs
+# (see values/capsule-values.yaml), so it needs cert-manager up first.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: capsule
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://projectcapsule.github.io/charts
+      chart: capsule
+      targetRevision: 0.7.2
+      helm:
+        releaseName: capsule
+        valueFiles:
+          - $values/clusters/production/values/capsule-values.yaml
+    - repoURL: https://github.com/astralops-sa/HomeLab
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: capsule-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

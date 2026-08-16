@@ -1,0 +1,10 @@
+# Step 3 of 3: the issuer everything else actually uses. Signs leaf certs
+# (ArgoCD, Headlamp, ...) off the root CA secret from step 2, so they all
+# chain to the one CA you imported — no more per-site "not trusted" prompts.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: ca-issuer
+spec:
+  ca:
+    secretName: selfsigned-ca-tls
