@@ -1,0 +1,38 @@
+# Generates one Application per clusters/production/tenants/<name>/ folder.
+# Empty today (no Tenant CRs onboarded yet) — matches zero directories
+# without error until the first tenant folder is added.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: tenants
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - git:
+        repoURL: https://github.com/astralops-sa/HomeLab
+        revision: main
+        directories:
+          - path: clusters/production/tenants/*
+  template:
+    metadata:
+      name: "tenant-{{ .path.basename }}"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/astralops-sa/HomeLab
+        targetRevision: main
+        path: "{{ .path.path }}"
+        directory:
+          recurse: true
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

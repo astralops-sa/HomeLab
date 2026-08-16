@@ -1,0 +1,11 @@
+# sync-wave 1: capsule's webhook can use cert-manager for its certs
+# (see values/capsule-values.yaml), so it needs cert-manager up first.
+name: capsule
+namespace: capsule-system
+syncWave: "1"
+helm:
+  repoURL: https://projectcapsule.github.io/charts
+  chart: capsule
+  targetRevision: "0.13.11"
+  releaseName: capsule
+  valuesFile: capsule-values.yaml

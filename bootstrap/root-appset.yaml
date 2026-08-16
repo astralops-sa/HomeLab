@@ -1,0 +1,40 @@
+# The ONLY manifest applied by hand (via bootstrap.sh).
+# Generates two child Applications ("infra" and "tenants"), each of which
+# recurses its clusters/production/appsets/<name>/ folder and applies the
+# ApplicationSet manifest found there — the "app of appsets" pattern.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - list:
+        elements:
+          - name: infra
+            path: clusters/production/appsets/infra
+          - name: tenants
+            path: clusters/production/appsets/tenants
+  template:
+    metadata:
+      name: "{{ .name }}"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/astralops-sa/HomeLab
+        targetRevision: main
+        path: "{{ .path }}"
+        directory:
+          recurse: true
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

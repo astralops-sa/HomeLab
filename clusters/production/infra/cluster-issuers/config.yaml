@@ -1,0 +1,6 @@
+# Plain-manifest component (no Helm chart) for cluster-scoped cert-manager
+# Issuers. Runs one wave after cert-manager so its CRDs/webhook are ready
+# before the ClusterIssuer is applied.
+name: cluster-issuers
+syncWave: "1"
+manifestPath: clusters/production/manifests/cluster-issuers

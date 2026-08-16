@@ -1,0 +1,9 @@
+name: cert-manager
+namespace: cert-manager
+syncWave: "0"
+helm:
+  repoURL: https://charts.jetstack.io
+  chart: cert-manager
+  targetRevision: v1.21.1
+  releaseName: cert-manager
+  valuesFile: cert-manager-values.yaml

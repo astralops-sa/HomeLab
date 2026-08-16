@@ -8,8 +8,10 @@
 #   3. helm-installs ArgoCD once, using the same values this repo will use
 #      going forward, so the ArgoCD Application that manages ArgoCD itself
 #      converges to a no-op diff
-#   4. applies the single root Application (app-of-apps) that then takes
-#      over syncing everything else, including ArgoCD, from this repo
+#   4. applies the root ApplicationSet, which generates an "infra" and a
+#      "tenants" Application, each applying its own ApplicationSet — those
+#      then take over syncing everything else, including ArgoCD, from this
+#      repo (app of appsets)
 #
 # After this runs, do NOT `helm upgrade` anything by hand. Edit the repo
 # and let ArgoCD reconcile.
@@ -65,12 +67,12 @@ helm upgrade --install argocd argo/argo-cd \
 log "Waiting for ArgoCD server to be ready"
 kubectl -n "${ARGOCD_NAMESPACE}" rollout status deploy/argocd-server --timeout=180s
 
-# ---- 4. apply the root app-of-apps ---------------------------------------
-log "Applying root Application"
-kubectl apply -f  bootstrap/root-app.yaml
+# ---- 4. apply the root ApplicationSet -------------------------------------
+log "Applying root ApplicationSet"
+kubectl apply -f  bootstrap/root-appset.yaml
 
 log "Done"
-echo "ArgoCD will now sync clusters/production/apps/* and manage the cluster from there."
+echo "ArgoCD will now sync clusters/production/infra/* and clusters/production/tenants/*, and manage the cluster from there."
 echo
 echo "Initial admin password:"
 kubectl -n "${ARGOCD_NAMESPACE}" get secret argocd-initial-admin-secret \

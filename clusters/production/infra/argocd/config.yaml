@@ -1,0 +1,15 @@
+# ArgoCD manages its own Helm release from here on. The release name/namespace
+# match what bootstrap.sh installed by hand, so this converges cleanly.
+# wave 2: wants the selfsigned-issuer (wave 1) to exist so its Ingress's
+# cert-manager annotation resolves cleanly on first sync
+name: argocd
+namespace: argocd
+syncWave: "2"
+helm:
+  repoURL: https://argoproj.github.io/argo-helm
+  chart: argo-cd
+  targetRevision: "10.3.3"
+  releaseName: argocd
+  valuesFile: argocd-values.yaml
+extraSyncOptions:
+  - ServerSideApply=true

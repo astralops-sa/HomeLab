@@ -1,0 +1,11 @@
+# wave 2: wants the selfsigned-issuer (wave 1) to exist so its Ingress's
+# cert-manager annotation resolves cleanly on first sync
+name: headlamp
+namespace: headlamp
+syncWave: "2"
+helm:
+  repoURL: https://kubernetes-sigs.github.io/headlamp/
+  chart: headlamp
+  targetRevision: "0.44.0"
+  releaseName: headlamp
+  valuesFile: headlamp-values.yaml

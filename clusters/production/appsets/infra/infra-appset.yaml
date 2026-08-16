@@ -1,0 +1,61 @@
+# Generates one Application per clusters/production/infra/<component>/config.yaml.
+# Branches between a Helm-chart Application (config has a `helm` block) and a
+# plain-manifest Application (config has `manifestPath` instead).
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: infra
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - git:
+        repoURL: https://github.com/astralops-sa/HomeLab
+        revision: main
+        files:
+          - path: "clusters/production/infra/*/config.yaml"
+  template:
+    metadata:
+      name: "{{ .name }}"
+      annotations:
+        {{- if .syncWave }}
+        argocd.argoproj.io/sync-wave: "{{ .syncWave }}"
+        {{- end }}
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      {{- if .helm }}
+      sources:
+        - repoURL: {{ .helm.repoURL }}
+          chart: {{ .helm.chart }}
+          targetRevision: "{{ .helm.targetRevision }}"
+          helm:
+            releaseName: {{ .helm.releaseName }}
+            valueFiles:
+              - $values/clusters/production/values/{{ .helm.valuesFile }}
+        - repoURL: https://github.com/astralops-sa/HomeLab
+          targetRevision: main
+          ref: values
+      {{- else }}
+      source:
+        repoURL: https://github.com/astralops-sa/HomeLab
+        targetRevision: main
+        path: {{ .manifestPath }}
+        directory:
+          recurse: true
+      {{- end }}
+      destination:
+        server: https://kubernetes.default.svc
+        {{- if .namespace }}
+        namespace: {{ .namespace }}
+        {{- end }}
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          {{- range .extraSyncOptions }}
+          - {{ . }}
+          {{- end }}
