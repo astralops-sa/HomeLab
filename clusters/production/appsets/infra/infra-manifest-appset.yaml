@@ -1,0 +1,38 @@
+# Generates one Application per clusters/production/infra/<component>/manifest.yaml
+# — plain-manifest infra components (no Helm chart), e.g. cluster-issuers.
+# See infra-helm-appset.yaml for why this is a separate ApplicationSet rather
+# than one template with a conditional.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: infra-manifest
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - git:
+        repoURL: https://github.com/astralops-sa/HomeLab
+        revision: main
+        files:
+          - path: "clusters/production/infra/*/manifest.yaml"
+  template:
+    metadata:
+      name: "{{ .name }}"
+      annotations:
+        argocd.argoproj.io/sync-wave: "{{ .syncWave }}"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/astralops-sa/HomeLab
+        targetRevision: main
+        path: "{{ .manifestPath }}"
+        directory:
+          recurse: true
+      destination:
+        server: https://kubernetes.default.svc
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

@@ -11,5 +11,3 @@ helm:
   targetRevision: "10.3.3"
   releaseName: argocd
   valuesFile: argocd-values.yaml
-extraSyncOptions:
-  - ServerSideApply=true
