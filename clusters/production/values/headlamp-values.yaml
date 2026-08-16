@@ -17,9 +17,12 @@ pluginsManager:
       - name: argocd
         source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_argocd
         version: 0.1.0
-      - name: ai-assistant
-        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_ai_assistant
-        version: 0.1.0-alpha
+      - name: capsule
+        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_capsule
+        version: 0.1.0
+    installOptions:
+      parallel: true
+      maxConcurrent: 2
   baseImage: node:lts-alpine
 
 # Behind Traefik, TLS terminated at the ingress with a cert-manager cert.
