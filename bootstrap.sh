@@ -17,18 +17,11 @@
 set -euo pipefail
 
 # ---- config -----------------------------------------------------------
-REPO_URL="https://github.com/astralops-sa/HomeLab"   # <-- change me
-REPO_REVISION="main"
 ARGOCD_NAMESPACE="argocd"
-ARGOCD_CHART_VERSION="7.7.11"   # argo-cd helm chart version, bump as needed
+ARGOCD_CHART_VERSION="10.3.3"   # argo-cd helm chart version, bump as needed
 # -------------------------------------------------------------------------
 
 log() { printf '\n\033[1;32m==> %s\033[0m\n' "$1"; }
-
-if [[ "${REPO_URL}" == *"YOUR_ORG/YOUR_REPO"* ]]; then
-  echo "Edit REPO_URL at the top of this script before running it." >&2
-  exit 1
-fi
 
 # ---- 1. install k3s -----------------------------------------------------
 if ! command -v k3s >/dev/null 2>&1; then
@@ -67,20 +60,17 @@ helm upgrade --install argocd argo/argo-cd \
   --namespace "${ARGOCD_NAMESPACE}" \
   --version "${ARGOCD_CHART_VERSION}" \
   --values clusters/production/values/argocd-values.yaml \
-  --wait --timeout 10m
+  --wait --timeout 5m
 
 log "Waiting for ArgoCD server to be ready"
 kubectl -n "${ARGOCD_NAMESPACE}" rollout status deploy/argocd-server --timeout=180s
 
 # ---- 4. apply the root app-of-apps ---------------------------------------
 log "Applying root Application"
-sed \
-  -e "s#__REPO_URL__#${REPO_URL}#g" \
-  -e "s#__REPO_REVISION__#${REPO_REVISION}#g" \
-  bootstrap/root-app.yaml | kubectl apply -f -
+kubectl apply -f  bootstrap/root-app.yaml
 
 log "Done"
-echo "ArgoCD will now sync clusters/production/apps/ from ${REPO_URL} (${REPO_REVISION})."
+echo "ArgoCD will now sync clusters/production/apps/* and manage the cluster from there."
 echo
 echo "Initial admin password:"
 kubectl -n "${ARGOCD_NAMESPACE}" get secret argocd-initial-admin-secret \

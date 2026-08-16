@@ -11,8 +11,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: __REPO_URL__
-    targetRevision: __REPO_REVISION__
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: main
     path: clusters/production/apps
     directory:
       recurse: true
