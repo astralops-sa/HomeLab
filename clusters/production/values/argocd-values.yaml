@@ -9,13 +9,6 @@ configs:
     # ingress using the cert-manager cert below. Without this, ArgoCD's
     # own TLS + the ingress's TLS fight each other.
     server.insecure: true
-  cm:
-    # Read-only anonymous access so in-cluster tools (e.g. the Headlamp
-    # ArgoCD plugin) can call the API without a session — it proxies to
-    # argocd-server unauthenticated and has no way to pass a login token.
-    users.anonymous.enabled: "true"
-  rbac:
-    policy.default: role:readonly
 
 controller:
   replicas: 1
