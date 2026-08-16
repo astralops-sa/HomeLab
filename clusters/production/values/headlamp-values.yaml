@@ -21,7 +21,11 @@ ingress:
       hosts:
         - headlamp.homelab.local     # <-- keep in sync with hosts[0].host above
 
+# Bind the chart's ServiceAccount to cluster-admin so Headlamp can read all
+# cluster resources. For a homelab this is fine; tighten if needed.
+clusterRoleBinding:
+  create: true
+  clusterRoleName: cluster-admin
+
 # In-cluster mode needs a token to log in. After it's up, generate one with:
 #   kubectl create token headlamp -n headlamp --duration=8760h
-# (assuming the chart's default ServiceAccount is used; grant it cluster-admin
-# or a narrower ClusterRoleBinding depending on how much access you want it to have)
