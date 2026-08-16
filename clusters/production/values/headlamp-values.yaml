@@ -1,8 +1,24 @@
 replicaCount: 1
 
+config:
+  watchPlugins: true
+
 service:
   type: ClusterIP
   port: 80
+
+pluginsManager:
+  enabled: true                              # Default is false
+  # configFile: "plugin.yml"                 # Default is uncommented. Comment this line and provide the Plugin configuration content in YAML format
+  configContent: |                           # Default is "". Add additional plugins as needed.  
+    plugins:
+      - name: cert-manager
+        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_cert-manager
+        version: 0.1.0
+      - name: ai-assistant
+        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_ai_assistant
+        version: 0.1.0-alpha
+  baseImage: node:lts-alpine
 
 # Behind Traefik, TLS terminated at the ingress with a cert-manager cert.
 # Change the hostname below to something real before your first sync.
