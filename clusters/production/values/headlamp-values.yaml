@@ -4,24 +4,6 @@ service:
   type: ClusterIP
   port: 80
 
-config:
-  watchPlugins: true
-pluginsManager:
-  enabled: true
-  configContent: |
-    plugins:
-      - name: argocd
-        source: https://artifacthub.io/packages/headlamp/headlamp-argocd/headlamp-argocd
-        version: 0.1.0
-      - name: cert-manager
-        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_cert-manager
-        version: 0.1.1
-    installOptions:
-      parallel: true
-      maxConcurrent: 2
-  baseImage: node:lts-alpine
-  version: latest
-
 # Behind Traefik, TLS terminated at the ingress with a cert-manager cert.
 # Change the hostname below to something real before your first sync.
 ingress:
